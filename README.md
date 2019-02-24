@@ -1,46 +1,41 @@
-# Introduction
+Course of action:
 
-The Dropwizard Hello World application
+Java, Maven and git installed.
+Cloned the haroonzone repository to import the application to local desktop. Created branch Jannath_changes in git for doing the changes as on the mail.
+Changed the port on the example.yaml to host the application on 9090 and 9091 (for discretion).
 
-# Running The Application
+Compiled and built the jar using maven. Maven is easy to use for any java application for its automation.
 
-To test the example application run the following commands.
 
-* To package the example run the following from the root dropwizard directory.
+Please find the Hello World response
 
-        mvn package
+The console displayed any input name in the Hello $name, and the id incremented by 1 for each hit of the link.
 
-* To run the server run.
 
-        java -jar target/hello-dropwizard-1.0-SNAPSHOT.jar server example.yml
 
-* To hit the Hello World example (hit refresh a few times).
+Please find the Health check response
 
-	http://localhost:8080/hello-world
 
-	http://localhost:8080/hello-world?name=World
 
-* The healthcheck resource runs the health check class we wrote. You should see something like this:
+The application and its jar was copied into a docker container with the below Dockerfile as a first step.
 
-  * deadlocks: OK
-  * template: OK
+FROM openjdk:8
+ADD target/hello-dropwizard-1.0-SNAPSHOT.jar /data/hello-dropwizard-1.0-SNAPSHOT.jar
+ADD example.yaml /data/example.yaml
+CMD java -jar /data/hello-dropwizard-1.0-SNAPSHOT.jar server /data/example.yaml
+EXPOSE 9090-9091
 
-# Dev Environment Exercise (Please ignore)
 
-## Background
-The company you work for is building a dropwizard Restful services.
-They have completed their first sprint of work and are ready to begin preparing to ship it. Being a DevOps genius, you know that it will be difficult to reproduce bugs and increase  ownership if there's not an easy way to  reliably run these services locally as you would in production. At the same time, you want to get some automation that can be reused in production.
+Created image using - docker build –f Dockerfile –t hellowizard .
 
-## Your Task
-Your next task is to take the recently built hello-dropwizard service:
+The application build and full automation was done in the next step of Docker file creation.
 
-- Read the documentation for the Hello Dropwizard service and test them to make sure they work as expected.
-- Once you understand their usage, use preferred tools and technology to create automation that stands up local dev environment of the stack.
-- You discuss with the engineers that in order for a service oriented architecture to work best, there will need to be some http routing in front of the services so that requests go to the right places. When the stack is deployed, accessing `/hello` should route to the *hello-dropwizard/hello-world*. Use technology and tools you know to implement this behavior.
+FROM openjdk:8
+RUN git clone https://github.com/haroonzone/hello-dropwizard.git
+RUN apt-get update -y && apt-get install maven -y
+RUN cd hello-dropwizard && mvn package
+CMD java -jar /target/hello-dropwizard-1.0-SNAPSHOT.jar server example.yaml
+EXPOSE 9090-9091
 
-*Bonus (Optional)*
-- If you haven't already, create an efficient docker image based on best practices for at least one service. Be prepared to explain why it's efficient.
 
-## Results
 
-Make the dev environment automation available via a public github repo with any instructions on how to run your dev environment in an accompanying `README.md` file. Send it in and be prepared to discuss it.
